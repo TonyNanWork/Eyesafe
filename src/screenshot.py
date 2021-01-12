@@ -18,7 +18,7 @@ win32gui.SetForegroundWindow(hwnd)
 bbox = win32gui.GetWindowRect(hwnd)
 img = ImageGrab.grab(bbox)
 
-img.save( r'picture\name.png' )
+img.save( r'picture\name.png')
 
 #myScreenshot = pyautogui.screenshot()
 #myScreenshot.save(r'picture\name.png')

@@ -17,6 +17,14 @@ from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
 from azure.cognitiveservices.vision.face.models import TrainingStatusType, Person
 
+frequency = 10
+waitTime = 60/frequency
+minutes = 1
+
+threshold = frequency * minutes * .90
+
+count = 0
+
 
 KEY = 'a92776836a8e40318cdc4f493b2eb564'
 
@@ -68,7 +76,32 @@ for face in detected_faces:
 img.show()
 
 
+while(True):
+    if(count > threshold ):
+        count = 0
+        playsound(r'audio/test.wav')
+    else:
 
-playsound(r'audio/test.wav')
+        cam = cv2.VideoCapture(0)
+
+        ret, frame = cam.read()
+
+        img_name = r"picture\name.png".format()
+        cv2.imwrite(img_name, frame)
+
+        cam.release()
+        cv2.destroyAllWindows()
 
 
+        test_image_array = glob.glob(r'picture/name.png')
+        image = open(test_image_array[0], 'r+b')
+
+        face_ids = []
+
+        detected_faces = face_client.face.detect_with_stream(image, detectionModel='detection_01')
+        if not detected_faces:
+            count -=1
+        count += 1
+
+    print(count)
+    time.sleep(waitTime)

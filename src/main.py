@@ -7,6 +7,7 @@ import time
 import uuid
 import requests
 import cv2
+import json
 from playsound import playsound
 from urllib.parse import urlparse
 from io import BytesIO
@@ -34,29 +35,6 @@ face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
 
 
 
-
-test_image_array = glob.glob(r'picture/name.png')
-image = open(test_image_array[0], 'r+b')
-
-face_ids = []
-
-# We use detection model 2 because we are not retrieving attributes.
-detected_faces = face_client.face.detect_with_stream(image, detectionModel='detection_01')
-if not detected_faces:
-    raise Exception('No face detected from image {}'.format(single_image_name))
-
-# Convert width height to a point in a rectangle
-def getRectangle(faceDictionary):
-    rect = faceDictionary.face_rectangle
-    left = rect.left
-    top = rect.top
-    right = left + rect.width
-    bottom = top + rect.height
-    
-    return ((left, top), (right, bottom))
-
-
-
 while(True):
     if(count > threshold ):
         count = 0
@@ -77,12 +55,16 @@ while(True):
         test_image_array = glob.glob(r'picture/name.png')
         image = open(test_image_array[0], 'r+b')
 
-        face_ids = []
+        
 
-        detected_faces = face_client.face.detect_with_stream(image, detectionModel='detection_01')
+        detected_faces = face_client.face.detect_with_stream(image,return_face_attributes=['headpose'])
+        #temp = json.loads(detected_faces[0])
+        
+
         if detected_faces:
-            print(detected_faces.faceId)
-        count += 1
-
+            if(-26.0 <= detected_faces[0].face_attributes.head_pose.yaw <= 26.0):
+                print(detected_faces[0].face_attributes.head_pose.yaw)
+                count += 1
+                
     print(count)
     time.sleep(waitTime)
